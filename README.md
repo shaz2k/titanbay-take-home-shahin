@@ -1,6 +1,6 @@
 # Titanbay take-home — API backend (TypeScript)
 
-Initial **starter** repo: **Fastify** + **PostgreSQL** + **Drizzle ORM** + **Zod**, with **no application tables** and **no REST resources** beyond `GET /health`.
+**Fastify** + **PostgreSQL** + **Drizzle ORM** + **Zod**. Domain tables are defined in `src/db/schema.ts`; only `GET /health` is exposed so far.
 
 ## Stack
 
@@ -12,12 +12,24 @@ Initial **starter** repo: **Fastify** + **PostgreSQL** + **Drizzle ORM** + **Zod
 | Validation       | [Zod](https://zod.dev/) (helpers in `src/lib/validate.ts`)     |
 | Driver           | [postgres](https://github.com/porsager/postgres) (postgres.js) |
 
+## Data model (PostgreSQL)
+
+| Table | Drizzle export | Notes |
+| ----- | -------------- | ----- |
+| `funds` | `funds` | `status` enum: `Fundraising`, `Investing`, `Closed` |
+| `investors` | `investors` | `investor_type` enum: `Individual`, `Institution`, `Family Office`; unique `email` |
+| `investments` | `investments` | FK `investor_id` → `investors.id`, `fund_id` → `funds.id` (restrict on delete) |
+
+USD amounts use `numeric(20,2)`. `investment_date` is a PostgreSQL `date` (ISO string in app code). `created_at` on funds and investors is `timestamptz`.
+
+Apply to your database: `npm run db:push` or generate migrations with `npm run db:generate` then `npm run db:migrate`.
+
 ## What’s included
 
-- `src/db/schema.ts` — empty; add `pgTable` definitions when you model the domain. (If you previously ran an older schema against the same database, old tables may still exist in Postgres until you drop them manually.)
-- `src/db/index.ts` — DB connection via `DATABASE_URL`. When you have tables, pass `{ schema }` into `drizzle()` (see comment in file).
-- `src/lib/errors.ts`, `src/lib/validate.ts`, `src/plugins/error-handler.ts` — patterns for validation and JSON errors.
-- `src/routes/` — empty (placeholder); register new route modules from `app.ts`.
+- `src/db/schema.ts` — funds, investors, investments + enums.
+- `src/db/index.ts` — `DATABASE_URL` and Drizzle client with schema.
+- `src/lib/errors.ts`, `src/lib/validate.ts`, `src/plugins/error-handler.ts` — validation and JSON errors.
+- `src/routes/` — add REST modules and register them from `app.ts`.
 
 ## Setup
 

@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import * as schema from "./schema.js";
 
 const url = process.env.DATABASE_URL;
 if (!url) {
@@ -8,5 +9,5 @@ if (!url) {
 
 const client = postgres(url, { max: 10 });
 
-/** Drizzle client. Pass `{ schema }` to `drizzle()` once you export tables from `schema.ts`. */
-export const db = drizzle(client);
+export const db = drizzle(client, { schema });
+export { schema };

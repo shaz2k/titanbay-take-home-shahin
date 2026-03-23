@@ -31,3 +31,7 @@ export function notFound(resource: string, id: string): AppError {
 export function conflict(message: string, details?: unknown): AppError {
   return new AppError(409, "CONFLICT", message, details);
 }
+
+export function badRequest(message: string, details?: unknown): AppError {
+  return new AppError(400, "BAD_REQUEST", message, details);
+}

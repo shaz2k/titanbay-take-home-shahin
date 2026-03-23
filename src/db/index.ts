@@ -11,3 +11,7 @@ const client = postgres(url, { max: 10 });
 
 export const db = drizzle(client, { schema });
 export { schema };
+
+export async function closeDb(): Promise<void> {
+  await client.end({ timeout: 5 });
+}

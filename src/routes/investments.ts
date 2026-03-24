@@ -6,7 +6,8 @@ import { badRequest, notFound } from "../lib/errors.js";
 import { investmentToJson } from "../lib/mappers.js";
 import { parseBody, parseParams } from "../lib/validate.js";
 
-const fundIdParam = z.object({ fund_id: z.string().uuid() });
+/** Same param name as `GET /funds/:id` so find-my-way matches `/funds/:id` correctly. */
+const fundIdParam = z.object({ id: z.string().uuid() });
 
 const dateOnly = z
   .string()
@@ -28,8 +29,8 @@ function isForeignKeyViolation(e: unknown): boolean {
 }
 
 export async function investmentRoutes(app: FastifyInstance): Promise<void> {
-  app.get("/funds/:fund_id/investments", async (req, reply) => {
-    const { fund_id: fundId } = parseParams(req, fundIdParam);
+  app.get("/funds/:id/investments", async (req, reply) => {
+    const { id: fundId } = parseParams(req, fundIdParam);
 
     const [fund] = await db
       .select({ id: schema.funds.id })
@@ -46,8 +47,8 @@ export async function investmentRoutes(app: FastifyInstance): Promise<void> {
     return reply.send(rows.map(investmentToJson));
   });
 
-  app.post("/funds/:fund_id/investments", async (req, reply) => {
-    const { fund_id: fundId } = parseParams(req, fundIdParam);
+  app.post("/funds/:id/investments", async (req, reply) => {
+    const { id: fundId } = parseParams(req, fundIdParam);
     const body = parseBody(req, createInvestmentBody);
 
     const [fund] = await db

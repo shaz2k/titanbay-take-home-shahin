@@ -41,8 +41,8 @@ Apply to your database: `npm run db:push` or generate migrations with `npm run d
 | GET | `/funds/:id` | Get fund by UUID |
 | GET | `/investors` | List investors |
 | POST | `/investors` | Create investor (`name`, `investor_type`, `email`) |
-| GET | `/funds/:fund_id/investments` | List investments for a fund |
-| POST | `/funds/:fund_id/investments` | Create investment (`investor_id`, `amount_usd`, `investment_date` as `YYYY-MM-DD`) |
+| GET | `/funds/:id/investments` | List investments for a fund (`id` = fund UUID) |
+| POST | `/funds/:id/investments` | Create investment (`investor_id`, `amount_usd`, `investment_date` as `YYYY-MM-DD`) |
 
 Success bodies match the spec (arrays or single objects at the root, no `{ "data": ... }` wrapper). `404` uses `NOT_FOUND` when a fund or investor is missing; duplicate investor email returns `409 CONFLICT`.
 
@@ -133,6 +133,9 @@ Operational and validation errors use a consistent shape:
 
 - `npm run dev` — watch mode with `tsx`
 - `npm run build` / `npm start` — compile and run `dist/`
+- `npm test` — unit tests (Vitest, no database)
+- `npm run test:integration` — API + Postgres tests (needs **PostgreSQL running** and `.env` with `DATABASE_URL`; skipped with a warning if the DB is unreachable)
+- `npm run test:watch` — Vitest watch (unit only)
 - `npm run db:push` — apply schema to DB (after you define tables)
 - `npm run db:seed` — reset and insert sample funds / investors / investments (see Setup)
 - `npm run db:generate` / `db:migrate` — SQL migrations

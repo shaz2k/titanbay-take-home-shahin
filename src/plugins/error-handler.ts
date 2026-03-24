@@ -1,10 +1,26 @@
 import type { FastifyInstance } from "fastify";
 import { ZodError } from "zod";
-import { AppError } from "../lib/errors.js";
+import { isAppError } from "../lib/errors.js";
 
-export async function errorHandlerPlugin(app: FastifyInstance): Promise<void> {
+function isZodError(err: unknown): err is ZodError {
+  if (err instanceof ZodError) return true;
+  return (
+    typeof err === "object" &&
+    err !== null &&
+    (err as { name?: string }).name === "ZodError" &&
+    "issues" in err &&
+    Array.isArray((err as { issues: unknown }).issues)
+  );
+}
+
+/**
+ * Must run on the **root** Fastify instance (not inside `app.register()`), otherwise
+ * Fastify encapsulation limits the handler to that empty plugin scope and route errors
+ * fall through to the default serializer (`statusCode` / `code` at top level).
+ */
+export function registerRootErrorHandler(app: FastifyInstance): void {
   app.setErrorHandler((err, req, reply) => {
-    if (err instanceof ZodError) {
+    if (isZodError(err)) {
       return reply.status(400).send({
         error: {
           code: "VALIDATION_ERROR",
@@ -14,7 +30,7 @@ export async function errorHandlerPlugin(app: FastifyInstance): Promise<void> {
       });
     }
 
-    if (err instanceof AppError) {
+    if (isAppError(err)) {
       return reply.status(err.statusCode).send({
         error: {
           code: err.code,

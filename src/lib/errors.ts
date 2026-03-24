@@ -35,3 +35,18 @@ export function conflict(message: string, details?: unknown): AppError {
 export function badRequest(message: string, details?: unknown): AppError {
   return new AppError(400, "BAD_REQUEST", message, details);
 }
+
+/**
+ * Vitest/Vite can load duplicate class copies so `instanceof AppError` fails.
+ * Use this before branching on thrown errors in the global error handler.
+ */
+export function isAppError(err: unknown): err is AppError {
+  if (err instanceof AppError) return true;
+  if (typeof err !== "object" || err === null) return false;
+  const o = err as Record<string, unknown>;
+  return (
+    o.name === "AppError" &&
+    typeof o.statusCode === "number" &&
+    typeof o.code === "string"
+  );
+}

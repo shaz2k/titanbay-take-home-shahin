@@ -159,13 +159,13 @@ export function conflict(message: string, details?: unknown): AppError {
  * ```
  */
 export function badRequest(message: string, details?: unknown): AppError {
+  console.error(`[badRequest] ${message}`, details ?? "");
   return new AppError(400, "BAD_REQUEST", message, details);
 }
 
 /**
  * Type guard that checks whether a value is an {@link AppError}.
  *
- * Vitest/Vite can load duplicate class copies so `instanceof AppError` fails.
  * Use this before branching on thrown errors in the global error handler
  * to reliably detect AppError instances across module boundaries.
  *

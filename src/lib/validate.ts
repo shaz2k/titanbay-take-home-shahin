@@ -2,6 +2,7 @@ import type { FastifyRequest } from "fastify";
 import { ZodError, type ZodSchema } from "zod";
 import { AppError } from "./errors.js";
 
+// comment
 export function parseBody<T>(req: FastifyRequest, schema: ZodSchema<T>): T {
   const result = schema.safeParse(req.body);
   if (!result.success) {

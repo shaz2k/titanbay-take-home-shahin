@@ -10,6 +10,7 @@ export class AppError extends Error {
   readonly code: ErrorCode;
   readonly details?: unknown;
 
+  // Constructor
   constructor(
     statusCode: number,
     code: ErrorCode,
